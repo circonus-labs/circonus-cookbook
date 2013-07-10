@@ -146,8 +146,8 @@ class Circonus
 
   def make_exception_message(ex)
     message = ""
-    message += "  API token: " + @last_request_params[:headers][:x_circonus_auth_token] + "\n"
-    message += "        URI: " + @last_request_params[:url] + "\n"
+    message += "  API token: " + (@last_request_params[:headers] ? @last_request_params[:headers][:x_circonus_auth_token].to_s : 'nil') + "\n"
+    message += "        URI: " + @last_request_params[:url].to_s + "\n"
     message += "HTTP Method: " + @last_request_params[:method].to_s.upcase + "\n"
     reqbod = @last_request_params[:payload].nil? ? '' : JSON.pretty_generate(JSON.parse(@last_request_params[:payload]))
     message += (reqbod.empty? ? '' : "Request body:\n" + reqbod + "\n\n")
