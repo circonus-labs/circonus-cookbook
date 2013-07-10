@@ -109,6 +109,9 @@ def copy_resource_attributes_into_payload
   # brokers
   @new_resource.payload['brokers'] = @new_resource.brokers.map { |broker_name|
     broker_id = api.find_broker_id(broker_name)
+    if broker_id.nil? then 
+      raise Chef::Exceptions::ConfigurationError, "Could not locate a broker ID for a broker with the name '#{broker_name}' - are you sure it's spelled correctly?  Visit https://<your-circonus-server>/brokers to verify the active broker list."
+    end
     '/broker/' + broker_id
   }.sort
 
