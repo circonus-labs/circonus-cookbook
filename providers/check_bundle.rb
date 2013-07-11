@@ -107,6 +107,10 @@ def copy_resource_attributes_into_payload
   @new_resource.payload['target'] = @new_resource.target
 
   # brokers
+  if @new_resource.brokers.empty? then
+    raise Chef::Exceptions::ConfigurationError, "Hrm, empty broker list for check bundle #{@new_resource.name}.  Either explicitly set 'brokers' resource attribute, or set node[:circonus][:default_brokers] to an array of broker names."    
+  end
+
   @new_resource.payload['brokers'] = @new_resource.brokers.map { |broker_name|
     broker_id = api.find_broker_id(broker_name)
     if broker_id.nil? then 
