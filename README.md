@@ -61,7 +61,7 @@ Resource Attributes:
 
     * name - Name of metric.  Consult your check type docs for information on what can go here.  Defaults to resource name.
     * type - Type of value returned - one of :text, :numeric,  or :histogram
-    * check_bundle - Name of the check bundle resource that shoudl contain this metric.  Required.
+    * check_bundle - Name of the check bundle resource that should contain this metric.  Required.
 
 Example:
 
@@ -80,6 +80,7 @@ Actions:
     * :create - Create/manage the metric
 
 Resource Attributes:
+
     * metric - Name of the circonus_metric resource this ruleset will be bound to.  Must be defined prior to the circonus_rule_set .
     * broker - Name of the circonus broker that is collecting stats for the metric.  You may repeat circonus_rule_sets on the same metric if you specify different brokers.
     * contact_groups - Ruby hash-of-arrays.  Keys are the strings '1','2', .. '5', representing the severity levels.    Values are arrays of string names of contact groups; when a rule fires at that severity level, all of the contact groups specified will be notified.  You may omit entries for which you have no contact groups.
