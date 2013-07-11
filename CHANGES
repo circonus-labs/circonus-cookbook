@@ -1,0 +1,5 @@
+
+2013-07-11 v0.0.3 clinton at omniti dot com
+  * Add better exception handling to check_bundle LWRP
+  * Typo and formatto fixes in README.md
+  * start change log (ahem)
