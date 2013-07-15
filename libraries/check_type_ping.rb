@@ -1,3 +1,4 @@
+require File.expand_path(File.dirname(__FILE__) + '/check_type')
 class Circonus
   class CheckType
     class Ping < Circonus::CheckType
