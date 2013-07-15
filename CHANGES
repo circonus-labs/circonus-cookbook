@@ -1,4 +1,7 @@
 
+2013-07-15 v0.0.4 clinton at omniti dot com
+  * Add facility to perform auto-discovery of available metrics for ping and nad check types
+
 2013-07-11 v0.0.3 clinton at omniti dot com
   * Add better exception handling to check_bundle LWRP
   * Typo and formatto fixes in README.md
