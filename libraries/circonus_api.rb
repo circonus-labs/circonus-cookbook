@@ -1,7 +1,7 @@
 
 # Circonus v2 API Client Library for chef-solo
 #
-# Loosely based on code by Adam Jacob 
+# Extremely loosely based on code by Adam Jacob 
 #   https://github.com/adamhjk/ruby-circonus/blob/master/lib/circonus.rb
 #
 # Author: Clinton Wolfe:: Clinton Wolfe (<clinton@omniti.com>)
