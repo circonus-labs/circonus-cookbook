@@ -18,6 +18,7 @@
     * Graph resource lacks facilities for access keys, guides, and composites
     * Support for graphs in default recipe (attribute walker)
     * Ability to control order of rules
+    * LWRP for worksheets
 
 ## Recipes
 
@@ -25,7 +26,7 @@
 
 Optional.  Lets you define circonus check bundles, metrics, and rules via the node's attributes.  See the 'Cookbook Attributes' section for details on the expected attribute structure.
 
-## Resources
+## LWRPs
 
 ### circonus_check_bundle
 
@@ -62,6 +63,8 @@ Resource Attributes:
     * name - Name of metric.  Consult your check type docs for information on what can go here.  Defaults to resource name.
     * type - Type of value returned - one of :text, :numeric,  or :histogram
     * check_bundle - Name of the check bundle resource that should contain this metric.  Required.
+
+See also: the Circonus::MetricScanner utility library, which helps enumerate available metrics.
 
 Example:
 
@@ -176,6 +179,32 @@ Resource Attributes:
     * hidden - true/false, false default
     * derive - :counter, :derive, :gauge - :gauge is default
     
+
+## Utility Library
+
+The cookbook includes a utility class, Circonus::MetricScanner, which provides a way to list the metrics available on a proposed check bundle before it is actually created in circonus.  This is needed for check types that can be configured, like nad and resmon.
+
+Example:
+
+    example_check_bundle_name = "nad demo - MetricScanner"
+    circonus_check_bundle example_check_bundle_name do 
+       type "json:nad"
+       config :url => '/'
+    end
+
+    # The metrics list is an Enumerable, so you can filter it.
+    nad_metrics = Circonus::MetricScanner.get(resources("circonus_check_bundle[#{example_check_bundle_name}]"))
+    nad_metrics.select { |name, type|
+       name =~ /^cpu`idle/
+    }.each do |metric_name, metric_type|
+        circonus_metric metric_name + ' on ' + example_check_bundle_name do 
+            metric_name metric_name
+            check_bundle example_check_bundle_name
+            type metric_type
+        end
+    end
+
+Currently very few check types are supported by MetricScanner - only ping and nad.
 
 ## Cookbook Attributes
 
