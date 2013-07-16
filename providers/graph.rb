@@ -147,7 +147,13 @@ def ensure_all_datapoints_have_check_id_present
   end
 end
 
-
+def workaround_alpha_roundtrip_bug 
+  new_resource.payload['datapoints'].each do |datapoint_payload|
+    if datapoint_payload['alpha'].nil? then
+      datapoint_payload['alpha'] = 255
+    end
+  end
+end
 
 def action_create
   # If we are in fact disabled, return now
@@ -181,6 +187,8 @@ def action_upload
   Chef::Log.debug("About to upload graph, have payload:\n" + JSON.pretty_generate(@new_resource.payload))
 
   ensure_all_datapoints_have_check_id_present
+  workaround_alpha_roundtrip_bug
+
 
   if @new_resource.exists then
     Chef::Log.info("Circonus graph upload: EDIT mode, id " + @new_resource.id)

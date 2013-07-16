@@ -95,6 +95,11 @@ def any_payload_changes?
   # Treat color special by allowing the server to set a default.
   new_payload['color'] ||= old_payload['color']
 
+  # Treat alpha special by allowing the server to set a default.
+  new_payload['alpha'] ||= old_payload['alpha']
+  # However, server has a bug; may set alpha to invalid value null.  Check and fix.
+  new_payload['alpha'] = new_payload['alpha'].nil? ? 'ff' : new_payload['alpha']
+  
   fields = [
             'axis',
             'data_formula',
