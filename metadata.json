@@ -4,6 +4,6 @@
     "license":"All rights reserved",
     "description":"Circonus API client lib, resources, and such",
     "long_description":"Client interface to the Circonus monitoring, alerting, and trending system.  Provides resources for registering checks, metrics, rules, and graphs.",
-    "version":"0.0.4",
+    "version":"0.0.5",
     "name":"circonus"
 }
