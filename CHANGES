@@ -1,4 +1,7 @@
 
+2013-07-15 v0.0.5 clinton at omniti dot com
+  * Only use guess_main_ip for target if it is available
+
 2013-07-15 v0.0.4 clinton at omniti dot com
   * Add facility to perform auto-discovery of available metrics for ping and nad check types
 

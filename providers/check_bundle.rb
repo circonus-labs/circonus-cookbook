@@ -7,7 +7,11 @@ def load_current_resource
   # Apply defaults to the desired state
   # TODO - should this be in the resource initialize() ?
   unless @new_resource.target then 
-    tgt = node['circonus']['target'].empty? ? guess_main_ip() : node['circonus']['target']
+    if self.respond_to?(:guess_main_ip) then
+      tgt = node['circonus']['target'].empty? ? guess_main_ip() : node['circonus']['target']
+    else
+      tgt = node['circonus']['target']
+    end
     @new_resource.target(tgt)
   end
   if @new_resource.brokers.nil? then
