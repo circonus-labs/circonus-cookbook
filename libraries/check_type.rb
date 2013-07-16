@@ -1,18 +1,26 @@
 class Circonus
 
   class MetricScanner
-    @@klass_by_type = {}
+    @@klass_by_type ||= {}
 
     def self.get(check_bundle_resource)
       klass = @@klass_by_type[check_bundle_resource.type.to_sym]
       unless klass then
-        raise "Sorry, no support in Circonus::MediaScanner for check type '#{check_bundle_resource.type.to_sym}' yet"
+        # Total hack; register_type not working for a user but I can't reproduce the issue :(
+        case check_bundle_resource.type.to_sym
+        when :ping_icmp
+          klass = Circonus::CheckType::Ping
+        when :'json:nad', :nad
+          klass = Circonus::CheckType::Nad
+        else
+          raise "Sorry, no support in Circonus::MediaScanner for check type '#{check_bundle_resource.type.to_sym}' yet"
+        end
       end
       klass.new(check_bundle_resource)
     end
 
     def self.register_type (type, klass)
-      @@klass_by_type[type] = klass
+      @@klass_by_type[type.to_sym] = klass
     end                            
   end
   
