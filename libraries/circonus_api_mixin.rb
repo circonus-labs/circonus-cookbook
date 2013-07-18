@@ -7,7 +7,12 @@ module CirconusApiMixin
         Chef::Log.warn("Attribute node[:circonus][:app_token] is deprecated - use node[:circonus][:api_token]")        
       end
       token = node['circonus']['api_token'].nil? ? node['circonus']['app_token'] : node['circonus']['api_token']
-      @@circ_client = Circonus.new(token, node['circonus']['api_url'])
+      @@circ_client = Circonus.new(token, node['circonus']['api_url'], node['circonus']['cache_path'])
+
+      if node['circonus']['clear_cache_on_start'] then
+        @@circ_client.clear_cache
+      end
+
     end
     @@circ_client
   end
