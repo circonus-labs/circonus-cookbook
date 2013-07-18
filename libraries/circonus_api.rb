@@ -28,6 +28,7 @@
 require 'json'
 require 'rest_client'
 require 'uri'
+require 'fileutils'
 
 if RUBY_VERSION =~ /^1\.8/
   class Dir
@@ -42,7 +43,7 @@ end
 
 module RestClient
   class Resource
-    alias :brackets_orig :"[]"
+    alias :brackets_orig :"[]"    
     def [](resource_name)
       brackets_orig(URI.escape(resource_name))      
     end
@@ -52,18 +53,20 @@ end
 class Circonus
   VERSION = "0.2.0"
   APP_NAME = 'omniti_chef_cookbook'
-  CACHE_PATH = '/var/tmp/chef-circonus'
+  DEFAULT_CACHE_PATH = '/var/tmp/chef-circonus'
 
   attr_writer :app_token, :account
   attr_reader :rest
+  attr_reader :cache_path
   attr_writer :last_request_params
 
 
-  def initialize(app_token, api_url)
+  def initialize(app_token, api_url, cache_path_opt=DEFAULT_CACHE_PATH)
     @app_token = app_token
+    @cache_path = cache_path_opt
 
-    unless Dir.exists?(CACHE_PATH) then
-      Dir.mkdir(CACHE_PATH)
+    unless Dir.exists?(cache_path) then
+      Dir.mkdir(cache_path)
     end
 
     headers = {
@@ -227,17 +230,24 @@ class Circonus
   #---------------
 
   def load_cache_file (which)
-    if File.exists?(CACHE_PATH + '/' + which) then
-      return JSON.parse(IO.read(CACHE_PATH + '/' + which))
+    if File.exists?(cache_path + '/' + which) then
+      return JSON.parse(IO.read(cache_path + '/' + which))
     else
       return {}
     end
   end
 
   def write_cache_file (which, data)
-    File.open(CACHE_PATH + '/' + which, 'w') do |file|
+    File.open(cache_path + '/' + which, 'w') do |file|
       file.print(JSON.pretty_generate(data))
     end
+  end
+
+  def clear_cache
+    if File.exists?(cache_path) then
+      FileUtils.rm_rf(cache_path)
+    end
+    Dir.mkdir(cache_path)
   end
 
 
