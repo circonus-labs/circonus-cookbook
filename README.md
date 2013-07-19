@@ -174,6 +174,7 @@ Resource Attributes:
     * broker - name of the broker, used to identify the check
     * axis - :r or :l, which axis the the data should be measured against
     * color - #FF00FF style; if omitted, circonus server will provide a default
+    * alpha - float or integer; 0 - 1; defaults to 0.3
     * data_formula - see web UI help; may be left null
     * legend_formula - see web UI help; may be left null
     * hidden - true/false, false default
