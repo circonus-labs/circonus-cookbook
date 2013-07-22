@@ -1,4 +1,4 @@
-actions :create, :upload # :delete # TODO
+actions :create, :upload, :delete
 attribute :display_name, :name_attribute
 attribute :target
 attribute :timeout, :kind_of => Integer, :default => 10
@@ -11,6 +11,7 @@ attribute :config, :kind_of => Hash, :default => {}
 # TODO - these should be private or readonly
 attribute :exists, :kind_of => [TrueClass, FalseClass], :default => false
 attribute :payload, :kind_of => Hash
+attribute :delete_requested, :kind_of => [TrueClass, FalseClass], :default => false
 
 # Gross hack so metric resources can find both the new_resouce and current_resource
 attribute :current_resource_ref
