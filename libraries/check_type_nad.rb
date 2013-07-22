@@ -34,7 +34,11 @@ class Circonus
         flattened = Hash.new
         data.each do |plugin_name, checks|
           checks.each do |check_name, check_details|
-            flattened["#{plugin_name}`#{check_name}"] = NAD_TYPE_TO_CIRCONUS_TYPE[check_details['_type']]
+            full_name = "#{plugin_name}`#{check_name}"
+            flattened[full_name.to_sym] = {
+              :label => full_name,  # No way of knowing a prettier name
+              :type  => NAD_TYPE_TO_CIRCONUS_TYPE[check_details['_type']],
+            }
           end
         end
         

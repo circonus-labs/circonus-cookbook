@@ -10,11 +10,11 @@ class Circonus
 
       def all
         return {
-          'Available (percent)'     => :numeric,
-          'Avg roundtrip (seconds)' => :numeric,
-          'Max roundtrip (seconds)' => :numeric,
-          'Min roundtrip (seconds)' => :numeric,
-          'Packets sent'            => :numeric,      
+          :available => { :label => 'Available (percent)',     :type => :numeric, },
+          :average   => { :label => 'Avg roundtrip (seconds)', :type => :numeric, },
+          :maximum   => { :label => 'Max roundtrip (seconds)', :type => :numeric, },
+          :minimum   => { :label => 'Min roundtrip (seconds)', :type => :numeric, },
+          :count     => { :label => 'Packets sent',            :type => :numeric, },
         }
       end
     end
