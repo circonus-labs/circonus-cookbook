@@ -220,7 +220,12 @@ class Circonus
     method_name = 'delete_' + resource_name
     send :define_method, method_name do |resource_id|
       bomb_shelter {
-        JSON.parse(@rest[resource_name + '/' + resource_id.to_s].delete)
+        rv = @rest[resource_name + '/' + resource_id.to_s].delete
+        if rv == '' then 
+          return {}
+        else          
+          JSON.parse(rv)
+        end
       }
     end
   end

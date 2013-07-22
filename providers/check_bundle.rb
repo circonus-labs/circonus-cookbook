@@ -73,12 +73,11 @@ def load_current_resource
   end
 
   # Chef::Log.debug("In bundle.LCR, current check bundle exists is " + @current_resource.exists.inspect)
-  
   if @current_resource.exists then
 
-
+    # Chef::Log.info(">>>>>>>>In bundle.LCR, current check bundle exists and payload is #{@current_resource.payload.inspect}")
     # WORKAROUND - if a check_bundle has been deleted, it will be returned with a single metric, that is an empty hash.  If so, remove that.
-    if @current_resource.payload['status'] == 'deleted' then
+    if ['deleted', 'disabled'].include?(@current_resource.payload['status']) then
       if @current_resource.payload['metrics'].length == 1 && @current_resource.payload['metrics'][0].empty? then
         @current_resource.payload['metrics'] = []
       end
@@ -184,7 +183,6 @@ def action_create
     return
   end
 
-
   # We don't actually do anything here
   # Other than decide whether to add a late upload notification  
   
@@ -202,6 +200,32 @@ def action_create
 
 end
 
+
+def action_delete
+  # If we are in fact disabled, return now
+  unless (node['circonus']['enabled']) then
+    Chef::Log.info("Doing nothing for circonus_check_bundle[#{@current_resource.name}] because node[:circonus][:enabled] is false")
+    return
+  end
+
+  # We don't actually do anything here
+  # Other than decide whether to add a late upload notification  
+  unless @current_resource.exists then
+    # Chef::Log.info(">>>>>>>CB.action_delete - current resource does not exist - never created?")
+    # Never created?
+    return
+  end
+
+  # Old API bug had two different values for the status
+  unless @current_resource.payload['status'] == 'deleted' || @current_resource.payload['status'] == 'disabled' then
+    # Chef::Log.info(">>>>>>>CB.action_delete - injecting upload action")
+    @new_resource.updated_by_last_action(true)
+    @new_resource.delete_requested(true)
+    @new_resource.notifies(:upload, @new_resource, :delayed)        
+  end
+
+end
+
 def action_upload
 
   # If we are in fact disabled, return now
@@ -210,23 +234,37 @@ def action_upload
     return
   end
 
-  # At this point we assume @new_resource.payload is correct
+  # OK, three cases: 
+  #  create new check bundle
+  #  edit existing check bundle
+  #  delete check bundle
+
 
   # Chef::Log.debug("About to upload check_bundle, have payload:\n" + JSON.pretty_generate(@new_resource.payload))
 
-  if @new_resource.exists then
+  if @new_resource.exists && ! @new_resource.delete_requested then
     Chef::Log.info("Upload: EDIT mode, id " + @new_resource.id)
 
     # Fixup the payload: force the status to be active, if it is currently deleted
     # elsewise circonus throws a 400 error
-    # TODO - will have to be smarter if we ever support an actual delete action
     if @new_resource.payload['status'] == 'disabled' or @new_resource.payload['status'] == 'deleted' then
       @new_resource.payload['status'] = 'active'
     end
 
+    # At this point we assume @new_resource.payload is correct
+    # (was set by metrics, probably)
     api.edit_check_bundle(@new_resource.id, @new_resource.payload)
+
+  elsif @new_resource.exists && @new_resource.delete_requested then
+    Chef::Log.info("Upload: DELETE mode, id " + @new_resource.id)
+
+    api.delete_check_bundle(@new_resource.id)    
+
   else
     Chef::Log.info("Upload: CREATE mode")
+
+    # At this point we assume @new_resource.payload is correct
+    # (was set by metrics, probably)
     new_bundle = api.create_check_bundle(@new_resource.payload)
 
     # parse out and store the ID - we need this in case we are creating dependents (like rulesets) in this run

@@ -1,4 +1,4 @@
-actions :create #, :delete # TODO
+actions :create
 attribute :metric_name, :name_attribute
 attribute :check_bundle
 attribute :type, :kind_of => Symbol, :equal_to => [:text, :numeric, :histogram]
