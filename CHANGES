@@ -1,3 +1,9 @@
+2013-07-22 v0.0.6 clinton at omniti dot com
+  * Change MetricScanner api to distinguish between internal Circonus 
+    metric names and human-visible names that appear in the web UI
+  * Fix ping metric scanner driver to provide correct internal names
+  * Cache clearing support via Node attributes
+  * New action :delete for check_bundle LWRP to support deprovisioning
 
 2013-07-16 v0.0.5 clinton at omniti dot com
   * Only use guess_main_ip for target if it is available
