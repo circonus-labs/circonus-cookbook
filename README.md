@@ -34,6 +34,7 @@ Manages a check bundle on circonus.  Note that you MUST have at least one circon
 
 Actions:
     * :create - Create/Manage the check bundle
+    * :delete - Delete the check bundle and all its metrics (WARNING: DATA LOSS).
 
 Resource Attributes:
 
