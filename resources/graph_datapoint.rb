@@ -3,6 +3,8 @@ actions :create #, :delete # TODO
 attribute :graph
 attribute :broker # We identify checks by broker
 attribute :metric # name of the chef circonus_metric resource
+attribute :alpha, :kind_of => Numeric, :default => 0.3,
+    :callbacks => {"should be a number between 0 and 1" => lambda {|i| self.validate_alpha(i) } }
 attribute :axis, :kind_of => Symbol, :equal_to => [:r, :l], :default => :l
 attribute :color, :kind_of => String, :regex => /^\#[0-9a-fA-F]{6}$/
 attribute :data_formula 
@@ -37,10 +39,11 @@ end
    #  "name"=>"Out Errors",
    #  "stack"=>nil},
 
-def to_payload_hash 
+def to_payload_hash
   payload = Hash.new()
 
   fields = [
+            'alpha',
             'axis',
             'check_id',
             'color',
@@ -72,4 +75,10 @@ def to_payload_hash
 
   return payload
 
+end
+
+private
+
+def self.validate_alpha(i)
+  i >= 0 && i <= 1
 end

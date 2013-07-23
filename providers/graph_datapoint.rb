@@ -101,6 +101,7 @@ def any_payload_changes?
   new_payload['alpha'] = new_payload['alpha'].nil? ? 'ff' : new_payload['alpha']
   
   fields = [
+            'alpha',
             'axis',
             'data_formula',
             'color',
