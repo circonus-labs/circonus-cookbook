@@ -13,7 +13,7 @@ class Circonus
         "l" => :numeric,
         "L" => :numeric,
         "n" => :numeric,
-        "s" => :string,
+        "s" => :text,
       }.freeze
 
       def all
