@@ -148,9 +148,17 @@ def ensure_all_datapoints_have_check_id_present
 end
 
 def workaround_alpha_roundtrip_bug 
+  #   For a while, datapoints created without an explicit alpha setting 
+  # would be created correctly, but when fetched, they would have a 
+  # present-but-null alpha value.  Since the library tries to roundtrip
+  # everything, it would POST/PUT the datapoint with an explicit null 
+  # for alpha, which would then be rejected by the API.
+  #   As of 2013-07-23, this is supposedly fixed, but existing datapoints
+  # might be returned in a broken state.  So, we retain
+  # this workaround just in case.
   new_resource.payload['datapoints'].each do |datapoint_payload|
     if datapoint_payload['alpha'].nil? then
-      datapoint_payload['alpha'] = 255
+      datapoint_payload['alpha'] = 0.3
     end
   end
 end
@@ -186,7 +194,7 @@ def action_upload
   # At this point we assume @new_resource.payload is correct
   Chef::Log.debug("About to upload graph, have payload:\n" + JSON.pretty_generate(@new_resource.payload))
 
-  ensure_all_datapoints_have_check_id_present
+  ensure_all_datapoints_have_check_id_present  
   workaround_alpha_roundtrip_bug
 
 
