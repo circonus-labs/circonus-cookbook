@@ -15,7 +15,6 @@
 ## TODO List
 
     * Most of the resources do not offer :delete actions yet (check_bundle does)
-    * Graph resource lacks facilities for access keys, guides, and composites
     * Support for graphs in default recipe (attribute walker)
     * Ability to control order of rules
     * LWRP for worksheets
