@@ -43,9 +43,11 @@ end
 
 module RestClient
   class Resource
-    alias :brackets_orig :"[]"    
-    def [](resource_name)
-      brackets_orig(URI.escape(resource_name))      
+    unless self.method_defined?(:brackets_orig) then
+      alias :brackets_orig :"[]"    
+      def [](resource_name)
+        brackets_orig(URI.escape(resource_name))      
+      end
     end
   end
 end
