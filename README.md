@@ -14,7 +14,7 @@
 
 ## TODO List
 
-    * None of the resources offer :delete actions yet
+    * Most of the resources do not offer :delete actions yet (check_bundle does)
     * Graph resource lacks facilities for access keys, guides, and composites
     * Support for graphs in default recipe (attribute walker)
     * Ability to control order of rules
@@ -170,6 +170,7 @@ Actions:
 
 Resource Attributes:
 
+    * type - :data, :guide, :composite - :data by default
     * graph - name of the circonus_graph chef resource on which to draw the data
     * metric - name of the circonus_metric chef resource that provides the data
     * broker - name of the broker, used to identify the check
@@ -181,6 +182,24 @@ Resource Attributes:
     * hidden - true/false, false default
     * derive - :counter, :derive, :gauge - :gauge is default
     
+In order to create a guide, the following attributes can/should be used:
+
+    * type - :guide
+    * name
+    * color
+    * hidden
+    * data_formula - ie "90000"
+    * legend_formula
+
+For composites, the following attributes can/should be used:
+
+    * type - :composite
+    * name
+    * color
+    * axis
+    * hidden
+    * data_formula - ie "= 100 * A / (A + B)"
+    * legend_formula
 
 ## Utility Library
 
@@ -285,4 +304,22 @@ Currently very few check types are supported by MetricScanner - only ping and na
         }       
 
     }
+
+# Contributing
+
+The main repo is at https://github.com/omniti-labs/circonus-cookbook - please fork, make a topic branch, and send a pull request when you want to submit.  
+
+# Authors
+
+## Maintainers
+
+  Clinton Wolfe
+
+## Contributors
+
+  Eric Saxby
+
+
+
+
 

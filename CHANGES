@@ -1,3 +1,7 @@
+2013-07-23 v0.0.7 clinton at omniti dot com
+  * (Eric Saxby) Provide proper default and validation for alpha attribute of graph_datapoint LWRP
+  * Correct metric type for text metrics in the nad Metric Scanner driver
+
 2013-07-22 v0.0.6 clinton at omniti dot com
   * Change MetricScanner api to distinguish between internal Circonus 
     metric names and human-visible names that appear in the web UI
