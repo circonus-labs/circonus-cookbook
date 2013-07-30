@@ -17,7 +17,7 @@ app_token = ENV['CIRCONUS_APP_TOKEN']
 
 
 # Main circonus API client object.  Use this to run API calls.
-circ = Circonus.new(app_token)
+circ = Circonus.new(app_token, 'https://api.circonus.com/v2/', '/tmp/my-cc')
 
 # The REST client contained inside the API client.  Use it to diagnose HTTP issues.
 rest = circ.rest
@@ -30,8 +30,8 @@ rest = circ.rest
 
 # pp means pretty-print
 
-# pp circ.list_brokers
-# pp circ.find_broker_id('agent-il-1')
+#pp circ.list_brokers
+#pp circ.find_broker_id('agent-il-1')
 
 # pp circ.list_contact_groups()
 # pp circ.find_contact_group_id('sysadmins')
@@ -40,7 +40,7 @@ rest = circ.rest
 # pp circ.list_check_bundles
 
 # try this instead - filters on target, and optionally check bundle type
-# pp circ.find_check_bundle_ids('192.168.11.10', 'resmon')
+pp circ.find_check_bundle_ids('185.2.138.140', 'ping_icmp')
 # pp circ.find_check_bundle_ids('dev.workingequity.com')
 
 # Once you have an ID, use it
