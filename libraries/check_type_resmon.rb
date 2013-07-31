@@ -1,6 +1,6 @@
 require 'open-uri'
 require 'rexml/document' # missu nokogiri
-require 'pp'
+# require 'pp'
 require File.expand_path(File.dirname(__FILE__) + '/check_type')
 
 class Circonus
@@ -25,7 +25,7 @@ class Circonus
         # TODO read SSl, path, etc from config
         url = "http://" + target + ":" + node[:resmon][:port].to_s + '/'        
         xml = open(url).read
-        pp xml
+        # pp xml
         doc = REXML::Document.new(xml)
 
         metric_info = Hash.new()
@@ -43,7 +43,7 @@ class Circonus
           end
         end
 
-        pp metric_info
+        # pp metric_info
         return metric_info
       end
     end
