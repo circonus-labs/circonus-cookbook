@@ -7,7 +7,7 @@ attribute :type, { :required => true, :kind_of => [Symbol, String] }
 attribute :brokers
 attribute :id, :kind_of => String, :regex => /^\d+$/
 attribute :config, :kind_of => Hash, :default => {}
-attribute :tags, :kind_of => Array, :default => {}
+attribute :tags, :kind_of => Array, :default => []
 
 # TODO - these should be private or readonly
 attribute :exists, :kind_of => [TrueClass, FalseClass], :default => false
