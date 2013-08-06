@@ -34,7 +34,7 @@ def load_current_resource
     return @current_resource
   end
 
-  # Ok, now we dow what load_current_resource is really supposed to do - determine the existing state
+  # Ok, now we do what load_current_resource is really supposed to do - determine the existing state
 
   if @new_resource.id then
     begin
@@ -99,7 +99,8 @@ end
 def init_empty_payload
   payload = {
     'metrics' => [],
-    'config' => {},
+    'config'  => {},
+    'tags'    => [],
   }
   @new_resource.payload(payload)
   
@@ -128,6 +129,7 @@ def copy_resource_attributes_into_payload
   @new_resource.payload['config'] = @new_resource.config()
   @new_resource.payload['period'] = @new_resource.period()
   @new_resource.payload['timeout'] = @new_resource.timeout()
+  @new_resource.payload['tags'] = @new_resource.tags()
 
 end
 
@@ -157,9 +159,9 @@ def any_payload_changes?
   end
   changed ||= this_changed
   
-
-
   # Type and display_name are identities
+
+  # Period and timeout are simple strings
   ['period', 'timeout' ].each do |field| 
     this_changed = @current_resource.payload[field].to_s != @new_resource.payload[field].to_s
     if this_changed then
@@ -169,6 +171,12 @@ def any_payload_changes?
     end
     changed ||= this_changed
   end
+
+  # Tags is an array of strings - sort and stringify first!
+  @current_resource.payload['tags'] ||= []
+  @current_resource.payload['tags'] = @current_resource.payload['tags'].map { |t| t.to_s }.sort
+  @new_resource.payload['tags'] = @new_resource.payload['tags'].map { |t| t.to_s }.sort
+  changed ||= @current_resource.payload['tags'] != @new_resource.payload['tags']
 
   changed
 
