@@ -72,6 +72,7 @@ def copy_resource_attributes_into_payload
 
   p = @new_resource.payload
 
+  # These are all strings
   [
    'max_left_y',
    'max_right_y',
@@ -91,6 +92,8 @@ def copy_resource_attributes_into_payload
   # guides - not touched
   # composites - not touched
 
+  # Tags is an array
+  @new_resource.payload['tags'] = @new_resource.tags()
   
 end
 
@@ -100,9 +103,7 @@ def any_payload_changes?
   # We don't look at graph_datapoints, because when a datapoint changes, it sends
   # an upload action notification to us anyway
 
-  # We don't manage guides, composites, or access keys
-
-  # These can all legitamitely change
+  # These can all legitimately change, and are all strings
 
   [
    'max_left_y',
@@ -120,6 +121,12 @@ def any_payload_changes?
     end
     changed ||= this_changed
   end
+
+  # Tags is an array of strings - sort and stringify first!
+  @current_resource.payload['tags'] ||= []
+  @current_resource.payload['tags'] = @current_resource.payload['tags'].map { |t| t.to_s }.sort
+  @new_resource.payload['tags'] = @new_resource.payload['tags'].map { |t| t.to_s }.sort
+  changed ||= @current_resource.payload['tags'] != @new_resource.payload['tags']
 
   return changed
 
