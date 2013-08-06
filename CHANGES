@@ -1,3 +1,7 @@
+2013-08-06 v0.0.8 clinton at omniti dot com
+  * Tags support for check bundles
+  * Tags support for graphs
+
 2013-07-23 v0.0.7 clinton at omniti dot com
   * (Eric Saxby) Provide proper default and validation for alpha attribute of graph_datapoint LWRP
   * (Eric Saxby) Add support for guide and composite graph datapoints to graph_datapoint LWRP

@@ -41,6 +41,7 @@ Resource Attributes:
     * target - Hostname or IP to query.  Defaults to node[:circonus][:target], which defaults to the node's guess_main_ip() according to NetInfo.
     * type - Type of check, like :resmon or :http    
     * brokers - Array of broker names.  Defaults to node[:circonus][:default_brokers]
+    * tags - Array of freeform strings to be used as tags in the web UI.  Default [ ] 
     * config - Hash of options specific to the check bundle type.  See https://circonus.com/resources/api/calls#check_bundles 
 
 Example:
@@ -155,6 +156,7 @@ Resource Attributes:
 
     * id - optional, GUID of the graph.  If provided, you can change the name of the graph; if omitted, changing the name of the graph will create a new graph.
     * style - :line or :area
+    * tags - Array of freeform strings to be used as tags in the web UI.  Default [ ] 
     * max_left_y, max_right_y, min_left_y, min_right_y - Y Axis limits
 
 ### circonus_graph_datapoint
