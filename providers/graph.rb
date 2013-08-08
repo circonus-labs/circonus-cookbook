@@ -170,6 +170,14 @@ def workaround_alpha_roundtrip_bug
   end
 end
 
+def scrub_payload
+  # We maintain some references to chef resources in the payload :(
+  # This is yeccky and should be fixed
+  # While the API currently ignores it, it's a lot of garbage to send
+  @new_resource.payload['datapoints'].each { |dp| dp.delete('metric_resource') }
+  
+end
+
 def action_create
   # If we are in fact disabled, return now
   unless (node['circonus']['enabled']) then
@@ -198,12 +206,12 @@ def action_upload
     return
   end
 
-  # At this point we assume @new_resource.payload is correct
-  Chef::Log.debug("About to upload graph, have payload:\n" + JSON.pretty_generate(@new_resource.payload))
-
   ensure_all_datapoints_have_check_id_present  
   workaround_alpha_roundtrip_bug
+  scrub_payload
 
+  # At this point we assume @new_resource.payload is correct
+  Chef::Log.debug("About to upload graph, have payload:\n" + JSON.pretty_generate(@new_resource.payload))
 
   if @new_resource.exists then
     Chef::Log.info("Circonus graph upload: EDIT mode, id " + @new_resource.id)
