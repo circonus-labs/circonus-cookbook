@@ -57,7 +57,7 @@ def load_current_resource
 
     # No ID provided - do an exhaustive search (though we cache on the target and type)
     ids = api.find_check_bundle_ids(@current_resource.target, @current_resource.type, @new_resource.display_name || @new_resource.name)    
-    # Chef::Log.info("<<<<<<< In bundle.LCR, search result for #{new_resource.name} on tgt #{@current_resource.target} type #{@current_resource.type} is " + ids.inspect)
+    Chef::Log.debug("<<<<<<< In bundle.LCR, search result for #{new_resource.name} on tgt #{@current_resource.target} type #{@current_resource.type} is " + ids.inspect)
 
     unless (ids.empty?) then 
       unless (ids.length == 1) then
@@ -248,7 +248,7 @@ def action_upload
   #  delete check bundle
 
 
-  # Chef::Log.debug("About to upload check_bundle, have payload:\n" + JSON.pretty_generate(@new_resource.payload))
+  
 
   if @new_resource.exists && ! @new_resource.delete_requested then
     Chef::Log.info("Upload: EDIT mode, id " + @new_resource.id)
@@ -259,17 +259,20 @@ def action_upload
       @new_resource.payload['status'] = 'active'
     end
 
+    Chef::Log.debug("About to upload check_bundle, have payload:\n" + JSON.pretty_generate(@new_resource.payload))
+
     # At this point we assume @new_resource.payload is correct
     # (was set by metrics, probably)
     api.edit_check_bundle(@new_resource.id, @new_resource.payload)
 
   elsif @new_resource.exists && @new_resource.delete_requested then
     Chef::Log.info("Upload: DELETE mode, id " + @new_resource.id)
-
+    Chef::Log.debug("About to upload check_bundle, have payload:\n" + JSON.pretty_generate(@new_resource.payload))
     api.delete_check_bundle(@new_resource.id)    
 
   else
     Chef::Log.info("Upload: CREATE mode")
+    Chef::Log.debug("About to upload check_bundle, have payload:\n" + JSON.pretty_generate(@new_resource.payload))
 
     # At this point we assume @new_resource.payload is correct
     # (was set by metrics, probably)
@@ -278,6 +281,7 @@ def action_upload
     # parse out and store the ID - we need this in case we are creating dependents (like rulesets) in this run
     @new_resource.id(new_bundle['_cid'].gsub('/check_bundle/', ''))
     @new_resource.current_resource_ref.id(@new_resource.id)
+    Chef::Log.debug("New check_bundle id is: #{@new_resource.id}")
   end
   @new_resource.updated_by_last_action(true)
 end
