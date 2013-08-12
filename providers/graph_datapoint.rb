@@ -100,7 +100,7 @@ def any_payload_changes?
     new = new_payload[field].to_s
     this_changed = old != new
     if this_changed then
-      Chef::Log.info("Circonus graph datapoint '#{@new_resource.name} shows field #{field} changed from '#{old}' to '#{new}'")
+      Chef::Log.debug("CCD: Circonus graph datapoint '#{@new_resource.name} shows field #{field} changed from '#{old}' to '#{new}'")
     end
     changed ||= this_changed
   end
@@ -141,17 +141,24 @@ def match_index
   # OK, we know we have a payload.  Are we in there as a graph_datapoint?
   @match_index ||= @current_resource.graph_payload.find_index do |datapoint|
 
+    Chef::Log.debug("Examining existing datapoint: " + datapoint.inspect())
+    Chef::Log.debug("Examining current check id: " + @current_resource.check_id.inspect())
+
     # Careful here.  We want to find any existing datapoint that matches on our identity fields.
     # Which would be the check_id and metric name.  Note that unlike rules and metrics, we do NOT compare on all fields - here, we only compare on our identity fields
     matched = true
     matched &&= datapoint['check_id'].to_s == @current_resource.check_id.to_s
+    Chef::Log.debug("Check IDs appear to match? #{matched}")
     if @new_resource.datapoint? then
-      matched &&= datapoint['metric_name'] == @current_resource.metric
+      # Chef resource name is @current_resource.metric
+      # We need the circonus metric name
+      circonus_metric_name = @current_resource.metric_resource.metric_name
+      Chef::Log.debug("Have my metric name as: #{circonus_metric_name}")
+      matched &&= datapoint['metric_name'] == circonus_metric_name
+      Chef::Log.debug("Metric names appear to match? #{matched}")
     else
       matched &&= datapoint['data_formula'] == @current_resource.data_formula
     end
-    Chef::Log.debug("Examining existing datapoint: " + datapoint.inspect())
-    Chef::Log.debug("Examining current check id: " + @current_resource.check_id.inspect())
     Chef::Log.debug("Matched? " + matched.inspect())
     matched
   end

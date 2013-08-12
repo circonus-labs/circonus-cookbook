@@ -117,7 +117,7 @@ def any_payload_changes?
     new = @new_resource.payload[field].to_s
     this_changed = old != new
     if this_changed then
-      Chef::Log.info("Circonus graph '#{@new_resource.name} shows field #{field} changed from '#{old}' to '#{new}'")
+      Chef::Log.debug("CCD: Circonus graph '#{@new_resource.name} shows field #{field} changed from '#{old}' to '#{new}'")
     end
     changed ||= this_changed
   end
@@ -126,7 +126,10 @@ def any_payload_changes?
   @current_resource.payload['tags'] ||= []
   @current_resource.payload['tags'] = @current_resource.payload['tags'].map { |t| t.to_s }.sort
   @new_resource.payload['tags'] = @new_resource.payload['tags'].map { |t| t.to_s }.sort
-  changed ||= @current_resource.payload['tags'] != @new_resource.payload['tags']
+  if @current_resource.payload['tags'] != @new_resource.payload['tags']
+    Chef::Log.debug("CCD: Circonus graph '#{@new_resource.name} shows field #{tags} changed from '#{@current_resource.payload['tags'].join(',')}' to '#{@new_resource.payload['tags'].join(',')}'")
+    changed = true
+  end
 
   return changed
 
