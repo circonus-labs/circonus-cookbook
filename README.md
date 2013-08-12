@@ -122,10 +122,10 @@ Resource Attributes:
     * criteria - Operator to use to detect a match of the rule.  Valid values:
         * 'min value' - for numeric metrics
         * 'max value' - for numeric metrics
-        * 'match' - regex, for text metrics
-        * 'does not match' - regex, for text metrics
-        * 'contains' - string, for text metrics
-        * 'does not contain' - string, for text metrics
+        * 'match' - exact match for text metrics
+        * 'does not match' - exact match for text metrics
+        * 'contains' - regex, for text metrics.  If the regex matches, the alert fires.
+        * 'does not contain' - regex, for text metrics.  If the regex does not match, the alert fires.
         * 'on change' - for text metrics, compares to last detected value
         * 'on absence' - for all metrics, detects metric loss of signal
     * severity - Integer severity level, 1-5.  If this rule matches, the contact group(s) assigned in the rule_set to this severity level will be notified.
