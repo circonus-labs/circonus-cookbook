@@ -177,6 +177,19 @@ def ensure_check_id_present
     
 end
 
+def provide_dummy_values_for_zero_arg_criteria
+  # For any rules with criteria 'on absence' or 'on change', no value attribute 
+  # should be required, but the API requires one.  
+  # Send an empty string as a dummy.
+  
+  @new_resource.payload['rules'].each do |rule|
+    next unless ['on absence', 'on change'].include?(rule['criteria'])
+    next if rule.has_key?('value')
+    rule['value'] = ''
+  end
+
+end
+
 
 def action_create
   # If we are in fact disabled, return now
@@ -209,6 +222,7 @@ def action_upload
 
   # May or may not have a check_id at this point, but we should be able to determine it
   ensure_check_id_present
+  provide_dummy_values_for_zero_arg_criteria
 
   # At this point we assume @new_resource.payload is correct
   Chef::Log.debug("About to upload rule_set, have payload:\n" + JSON.pretty_generate(@new_resource.payload))
