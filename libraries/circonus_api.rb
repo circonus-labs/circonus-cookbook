@@ -58,27 +58,29 @@ class Circonus
   DEFAULT_CACHE_PATH = '/var/tmp/chef-circonus'
   DEFAULT_TIMEOUT = 30
 
-  attr_writer :app_token, :account
+  attr_writer :api_token, :account
   attr_reader :rest
   attr_reader :cache_path
   attr_writer :last_request_params
+  attr_reader :options
 
+  def initialize(api_token, opts_in={})
+    @api_token = api_token
+    @options = opts_in
+    options[:cache_path] ||= DEFAULT_CACHE_PATH
+    options[:timeout]    ||= DEFAULT_TIMEOUT
 
-  def initialize(app_token, api_url, cache_path_opt=DEFAULT_CACHE_PATH, timeout=DEFAULT_TIMEOUT)
-    @app_token = app_token
-    @cache_path = cache_path_opt
-
-    unless Dir.exists?(cache_path) then
-      Dir.mkdir(cache_path)
+    unless Dir.exists?(options[:cache_path]) then
+      Dir.mkdir(options[:cache_path])
     end
 
     headers = {
-      :x_circonus_auth_token => @app_token,
+      :x_circonus_auth_token => @api_token,
       :x_circonus_app_name => APP_NAME,
       :accept => 'application/json',
     }
 
-    @rest = RestClient::Resource.new(api_url, {:headers => headers, :timeout => timeout, :open_timeout => timeout})
+    @rest = RestClient::Resource.new(options[:api_url], {:headers => headers, :timeout => options[:timeout], :open_timeout => options[:timeout]})
 
     me_myself = self
     RestClient.add_before_execution_proc { |req, params| me_myself.last_request_params = params }
@@ -110,7 +112,11 @@ class Circonus
                   'account',
                   'user',
                  ]
-              
+  
+  def raise_or_warn(ex)
+    raise blurb + make_exception_message(ex)
+  end
+    
   def bomb_shelter()
     attempts = 0
 
@@ -118,10 +124,10 @@ class Circonus
       result = yield
      
     rescue RestClient::Unauthorized => ex
-      raise "Circonus API error - HTTP 401 (API key missing or unauthorized)\nPro tip: you may not have added an API key under the node[:circonus][:api_token] attribute.  Try visiting the Circonus web UI, clicking on your account, then API Tokens, obtaining a token, and adding it to the attributes for this node.\n If you've already obtained a key, make sure it is authorized within Circonus." + make_exception_message(ex)
+      raise_or_warn ex, "Circonus API error - HTTP 401 (API key missing or unauthorized)\nPro tip: you may not have added an API key under the node[:circonus][:api_token] attribute.  Try visiting the Circonus web UI, clicking on your account, then API Tokens, obtaining a token, and adding it to the attributes for this node.\n If you've already obtained a key, make sure it is authorized within Circonus."
 
     rescue RestClient::Forbidden => ex
-      raise "Circonus API error - HTTP 403 (not authorized)\nPro tip: You are accessing a resource you (or rather, your api token) aren't allowed to.  Naughty!\n" + make_exception_message(ex)
+      raise_or_warn ex,  "Circonus API error - HTTP 403 (not authorized)\nPro tip: You are accessing a resource you (or rather, your api token) aren't allowed to.  Naughty!\n"
 
     rescue RestClient::ResourceNotFound => ex
       # Circonus nodes are eventually consistent.  When creating a check and a rule, often the check won't exist yet, according to circonus.  So we get a 404.  Wait and retry.
@@ -130,20 +136,20 @@ class Circonus
         sleep 1
         retry
       else
-        raise "Circonus API error - HTTP 404 (no such resource)\nPro tip: We tried 3 times already, in case Circonus was syncing.  Check the URL.\n" + make_exception_message(ex)
+        raise_or_warn ex,  "Circonus API error - HTTP 404 (no such resource)\nPro tip: We tried 3 times already, in case Circonus was syncing.  Check the URL.\n"
       end
 
     rescue RestClient::BadRequest => ex
       # Check for out of metrics
       explanation = JSON.parse(ex.http_body)
       if explanation['message'] == 'Usage limit' then
-        raise "Circonus API error - HTTP 400 (Usage Limit)\nPro tip: You are out of metrics!\n" + make_exception_message(ex)
+        raise_or_warn ex,  "Circonus API error - HTTP 400 (Usage Limit)\nPro tip: You are out of metrics!\n"
       else
-        raise "Circonus API error - HTTP 400 (we made a bad request)\nPro tip: Circonus didn't like something about the request contents.  It usually gives a detailed error message in the response body.\n" + make_exception_message(ex)
+        raise_or_warn ex,  "Circonus API error - HTTP 400 (we made a bad request)\nPro tip: Circonus didn't like something about the request contents.  It usually gives a detailed error message in the response body.\n"
       end
 
     rescue RestClient::InternalServerError => ex
-      raise "Circonus API error - HTTP 500 (server's brain exploded)\n" + make_exception_message(ex)
+      raise_or_warn ex,  "Circonus API error - HTTP 500 (server's brain exploded)\n"
     end
 
     result
@@ -238,24 +244,24 @@ class Circonus
   #---------------
 
   def load_cache_file (which)
-    if File.exists?(cache_path + '/' + which) then
-      return JSON.parse(IO.read(cache_path + '/' + which))
+    if File.exists?(options[:cache_path] + '/' + which) then
+      return JSON.parse(IO.read(options[:cache_path] + '/' + which))
     else
       return {}
     end
   end
 
   def write_cache_file (which, data)
-    File.open(cache_path + '/' + which, 'w') do |file|
+    File.open(options[:cache_path] + '/' + which, 'w') do |file|
       file.print(JSON.pretty_generate(data))
     end
   end
 
   def clear_cache
-    if File.exists?(cache_path) then
-      FileUtils.rm_rf(cache_path)
+    if File.exists?(options[:cache_path]) then
+      FileUtils.rm_rf(options[:cache_path])
     end
-    Dir.mkdir(cache_path)
+    Dir.mkdir(options[:cache_path])
   end
 
 
