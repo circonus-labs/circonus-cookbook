@@ -249,6 +249,9 @@ Currently very few check types are supported by MetricScanner - only ping and na
         # API errors when nodes are rapidly provisioned/deprovisioned.
         :clear_cache_on_start => false, 
 
+        # Timeout in seconds for API HTTP requests
+        :timeout => 10,
+
         # The remaining attrs are a convenience, for creating checks/metrics/rules from node attributes.
         # this tree gets interpreted by the circonus::default recipe
         :check_bundles => {

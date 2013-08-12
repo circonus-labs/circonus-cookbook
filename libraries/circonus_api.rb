@@ -56,6 +56,7 @@ class Circonus
   VERSION = "0.2.0"
   APP_NAME = 'omniti_chef_cookbook'
   DEFAULT_CACHE_PATH = '/var/tmp/chef-circonus'
+  DEFAULT_TIMEOUT = 30
 
   attr_writer :app_token, :account
   attr_reader :rest
@@ -63,7 +64,7 @@ class Circonus
   attr_writer :last_request_params
 
 
-  def initialize(app_token, api_url, cache_path_opt=DEFAULT_CACHE_PATH)
+  def initialize(app_token, api_url, cache_path_opt=DEFAULT_CACHE_PATH, timeout=DEFAULT_TIMEOUT)
     @app_token = app_token
     @cache_path = cache_path_opt
 
@@ -77,7 +78,7 @@ class Circonus
       :accept => 'application/json',
     }
 
-    @rest = RestClient::Resource.new(api_url, :headers => headers)
+    @rest = RestClient::Resource.new(api_url, {:headers => headers, :timeout => timeout, :open_timeout => timeout})
 
     me_myself = self
     RestClient.add_before_execution_proc { |req, params| me_myself.last_request_params = params }
