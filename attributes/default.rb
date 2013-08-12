@@ -8,6 +8,7 @@ default['circonus']['api_url'] = 'https://api.circonus.com/v2/'
 default['circonus']['cache_path'] = '/var/tmp/chef-circonus'
 default['circonus']['clear_cache_on_start'] = false
 default['circonus']['timeout'] = 10
+default['circonus']['halt_on_error'] = true
 
 
 # Used by the circonus::default recipe to generate resources from attributes

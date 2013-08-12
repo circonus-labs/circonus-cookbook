@@ -58,9 +58,8 @@ class Circonus
   DEFAULT_CACHE_PATH = '/var/tmp/chef-circonus'
   DEFAULT_TIMEOUT = 30
 
-  attr_writer :api_token, :account
+  attr_writer :api_token
   attr_reader :rest
-  attr_reader :cache_path
   attr_writer :last_request_params
   attr_reader :options
 
@@ -69,6 +68,7 @@ class Circonus
     @options = opts_in
     options[:cache_path] ||= DEFAULT_CACHE_PATH
     options[:timeout]    ||= DEFAULT_TIMEOUT
+    options[:halt_on_error] = true if options[:halt_on_error].nil?
 
     unless Dir.exists?(options[:cache_path]) then
       Dir.mkdir(options[:cache_path])
@@ -113,8 +113,20 @@ class Circonus
                   'user',
                  ]
   
-  def raise_or_warn(ex)
-    raise blurb + make_exception_message(ex)
+  def raise_or_warn(ex, blurb)
+    
+    message = blurb + make_exception_message(ex)
+
+    if options[:halt_on_error] then
+      raise message
+    else
+      if Object.const_defined?('Chef')
+        chef_module = Object.const_get('Chef')
+        chef_module.const_get('Log').send(:warn, message)
+      else
+        $stderr.puts "WARN: #{message}"
+      end
+    end
   end
     
   def bomb_shelter()
@@ -150,7 +162,15 @@ class Circonus
 
     rescue RestClient::InternalServerError => ex
       raise_or_warn ex,  "Circonus API error - HTTP 500 (server's brain exploded)\n"
+
+    rescue RestClient::RequestTimeout => ex
+      raise_or_warn ex,  "Circonus API error - HTTP Timeout.  Current timeout is #{options[:timeout]}.  You can adjust this setting using the node[:circonus][:timeout] setting.\n"
+
+
     end
+
+
+
 
     result
 
@@ -163,7 +183,7 @@ class Circonus
     message += "HTTP Method: " + @last_request_params[:method].to_s.upcase + "\n"
     reqbod = @last_request_params[:payload].nil? ? '' : JSON.pretty_generate(JSON.parse(@last_request_params[:payload]))
     message += (reqbod.empty? ? '' : "Request body:\n" + reqbod + "\n\n")
-    message += (ex.http_body.empty? ? '' : "Response body:\n" + ex.http_body + "\n\n")
+    message += ((ex.http_body.nil? || ex.http_body.empty?) ? '' : "Response body:\n" + ex.http_body + "\n\n")
 
     # D-BUG
     # message += @last_request_params.inspect()

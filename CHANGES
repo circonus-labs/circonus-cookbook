@@ -1,5 +1,6 @@
 
-
+  * :halt_on_error option make it possible to ignore some errors 
+    and continue chef run
   * Added HTTP timeout setting as cookbook attribute
   * MetricScanner drivers for :json and :http check types
   * Misc improvements to docs and debugging output

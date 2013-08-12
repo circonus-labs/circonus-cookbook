@@ -12,6 +12,7 @@ module CirconusApiMixin
         :api_url => node['circonus']['api_url'], 
         :cache_path => node['circonus']['cache_path'],
         :timeout => node['circonus']['timeout'],
+        :halt_on_error => node['circonus']['halt_on_error'],
       }
 
       @@circ_client = Circonus.new(token, options)

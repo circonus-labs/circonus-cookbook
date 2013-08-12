@@ -11,6 +11,7 @@
       * circonus_graph
       * circonus_graph_datapoint
     * A default recipe that uses the node attributes to create the above resources
+    * Ability to ignore configure API timeout and optionally continue despite API errors
 
 ## TODO List
 
@@ -251,6 +252,10 @@ Currently very few check types are supported by MetricScanner - only ping and na
 
         # Timeout in seconds for API HTTP requests
         :timeout => 10,
+
+        # Set this to false to treat API errors as warnings, continuing the chef run.
+        # Not all errors can be ignored.
+        :halt_on_error => true,
 
         # The remaining attrs are a convenience, for creating checks/metrics/rules from node attributes.
         # this tree gets interpreted by the circonus::default recipe
