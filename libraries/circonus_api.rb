@@ -206,6 +206,7 @@ class Circonus
 
   #---------------
   # Get Methods  - get_foo(id) - GET /v2/<resource>/id
+  #  Will escalate a 404 if not found
   #---------------
   [rw_resources, ro_resources].flatten.each do |resource_name| 
     method_name = 'get_' + resource_name
@@ -215,6 +216,29 @@ class Circonus
       }
     end
   end
+
+  #---------------
+  # Find Methods  - find_foo(id) - GET /v2/<resource>/id
+  #  Will return nil if not found
+  #---------------
+  [rw_resources, ro_resources].flatten.each do |resource_name| 
+    method_name = 'find_' + resource_name
+    send :define_method, method_name do |resource_id|
+      info = nil
+      begin
+        info = JSON.parse(@rest[resource_name + '/' + resource_id.to_s].get)
+      rescue RestClient::ResourceNotFound => ex
+        # Do nothing
+      rescue Exception => ex
+        # Kinda gross, but just hit it again to get error processing
+        bomb_shelter {
+          info = JSON.parse(@rest[resource_name + '/' + resource_id.to_s].get)
+        }
+      end
+      return info
+    end
+  end
+
 
   #---------------
   # Edit Methods  - edit_foo(id,content_as_ruby_hash) - PUT /v2/<resource>/id

@@ -37,19 +37,14 @@ def load_current_resource
 
     @current_resource.id(ruleset_id)
 
-    # It's legit for the metric to exist, but not have a ruleset
-    begin
-      @current_resource.payload(api.get_rule_set(ruleset_id))
+    # It's legit for the metric to exist, but not have a ruleset.  So, call find, not get.
+    existing_rule_set = api.find_rule_set(ruleset_id)
+    if existing_rule_set then
+      @current_resource.payload(existing_rule_set)
       @current_resource.exists(true)
-    rescue RuntimeError => ex
-      if ex.to_s.include?('Circonus API error - HTTP 404') then
-        @current_resource.exists(false)
-      else
-        # somthing else broke, re-raise
-        raise ex
-      end
+    else
+      @current_resource.exists(false)
     end
-
   end
 
   # If the ruleset currently exists, then copy in to the new resource.
