@@ -186,7 +186,7 @@ def any_payload_changes?
   @new_resource.payload['tags'] = @new_resource.payload['tags'].map { |t| t.to_s }.sort
   if @current_resource.payload['tags'] != @new_resource.payload['tags'] then
     changed = true
-    Chef::Log.debug("CCD: Check bundle - Saw change on field #{field} old value #{@current_resource.payload['tags'].join(',')} new value #{@new_resource.payload['tags'].join(',')}")
+    Chef::Log.debug("CCD: Check bundle - Saw change on field 'tags' old value #{@current_resource.payload['tags'].join(',')} new value #{@new_resource.payload['tags'].join(',')}")
   end
 
   changed
