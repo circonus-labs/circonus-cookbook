@@ -75,6 +75,7 @@ def init_empty_payload
     'rules' => [],
     'link' => '',
     'notes' => '',
+    'derive' => nil,
   }
   @new_resource.payload(payload)
 end
