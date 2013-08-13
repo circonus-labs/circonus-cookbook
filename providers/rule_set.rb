@@ -128,6 +128,9 @@ def copy_resource_attributes_into_payload
 end
 
 def any_payload_changes?
+
+  return true if @current_resource.payload.nil?
+
   changed = false
 
   # check, metric name, and metric type are identities - must not change
