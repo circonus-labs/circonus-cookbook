@@ -82,6 +82,8 @@ end
 def copy_resource_attributes_into_payload
 
   p = @new_resource.payload
+  # Wha...?
+  init_empty_payload if p.nil? 
 
   # derive
   p['derive'] = @new_resource.derive
