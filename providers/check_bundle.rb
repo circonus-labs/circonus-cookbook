@@ -1,3 +1,4 @@
+require 'set'
 include CirconusApiMixin
 
 # In our case, we must do some slight discovery on BOTH states
@@ -142,22 +143,29 @@ def any_payload_changes?
   changed = false
 
   # Broker list
-  this_changed = @current_resource.payload['brokers'] != @new_resource.payload['brokers']
+  this_changed = Set.new(@current_resource.payload['brokers']) != Set.new(@new_resource.payload['brokers'])
   if (this_changed) then 
-    # Chef::Log.debug("CHANGE_DETECT Check bundle -Saw change on field broker list")
+    Chef::Log.debug("CCD: Check bundle -Saw change on field broker list")
   end
   changed ||= this_changed
 
-  # Config - compare on string values
+  # Config - compare on string values, but allow server to provide defaults
   old = api.all_string_values(@current_resource.payload['config'])
   new = api.all_string_values(@new_resource.payload['config'])
-  this_changed =  old != new
-  if (this_changed) then 
-    # Chef::Log.debug("CHANGE_DETECT Check bundle - Examining existing config: " + old.inspect())
-    # Chef::Log.debug("CHANGE_DETECT Check bundle - Examining new config: " + new.inspect())
-    # Chef::Log.debug("CHANGE_DETECT Check bundle - Saw change on field config")
+  Chef::Log.debug("CCD: Check bundle - Examining existing config: " + old.inspect())
+  Chef::Log.debug("CCD: Check bundle - Examining new config: " + new.inspect())
+  this_changed = false
+  (old.keys + new.keys).uniq.each do |key|
+    if old.has_key?(key) && new.has_key?(key) && new[key] != old[key] then
+      this_changed = true
+      Chef::Log.debug("CCD: Check bundle - Saw change on field config/#{key}, changing from #{old[key]} to #{new[key]}")
+    elsif (!old.has_key?(key)) && new.has_key?(key) then
+      this_changed = true
+      Chef::Log.debug("CCD: Check bundle - Saw change on field config/#{key}, creating new value #{new[key]}")
+      # If old has a key and new doesn't, no change - that's the server setting a default
+    end
+    changed ||= this_changed
   end
-  changed ||= this_changed
   
   # Type and display_name are identities
 
@@ -165,9 +173,9 @@ def any_payload_changes?
   ['period', 'timeout' ].each do |field| 
     this_changed = @current_resource.payload[field].to_s != @new_resource.payload[field].to_s
     if this_changed then
-      # Chef::Log.debug("CHANGE_DETECT Check bundle - Current #{field}:" + @current_resource.payload[field].inspect())
-      # Chef::Log.debug("CHANGE_DETECT Check bundle - New #{field}:" + @new_resource.payload[field].inspect())
-      # Chef::Log.debug("CHANGE_DETECT Check bundle - Saw change on field #{field}")
+      Chef::Log.debug("CCD: Check bundle - Current #{field}:" + @current_resource.payload[field].inspect())
+      Chef::Log.debug("CCD: Check bundle - New #{field}:" + @new_resource.payload[field].inspect())
+      Chef::Log.debug("CCD: Check bundle - Saw change on field #{field}")
     end
     changed ||= this_changed
   end
@@ -176,7 +184,10 @@ def any_payload_changes?
   @current_resource.payload['tags'] ||= []
   @current_resource.payload['tags'] = @current_resource.payload['tags'].map { |t| t.to_s }.sort
   @new_resource.payload['tags'] = @new_resource.payload['tags'].map { |t| t.to_s }.sort
-  changed ||= @current_resource.payload['tags'] != @new_resource.payload['tags']
+  if @current_resource.payload['tags'] != @new_resource.payload['tags'] then
+    changed = true
+    Chef::Log.debug("CCD: Check bundle - Saw change on field #{field} old value #{@current_resource.payload['tags'].join(',')} new value #{@new_resource.payload['tags'].join(',')}")
+  end
 
   changed
 

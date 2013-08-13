@@ -1,4 +1,6 @@
-
+2013-08-12 v0.0.9 clinton at omniti dot com  
+  * Several minor fixes to change detection in graph datapoints, rules, 
+    check bundles, and metrics, which were causing spurious API calls. 
   * :halt_on_error option make it possible to ignore some errors 
     and continue chef run
   * Added HTTP timeout setting as cookbook attribute

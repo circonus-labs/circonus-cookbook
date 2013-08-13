@@ -39,13 +39,20 @@ def load_current_resource
   if @current_resource.check_bundle_resource.exists then
     # OK, we know we have a payload.  Are we in there as a metric?
     circonus_metric_name = @new_resource.metric_name() || @new_resource.name()
-    hits = @current_resource.check_bundle_resource.payload['metrics']
-    hits = hits.select { |m| m['name'] == circonus_metric_name }
-    hits = hits.select { |m| m['type'] ==  @new_resource.type().to_s() }
 
-    # Chef::Log.debug("CHANGE DETECT Metric - For metric #{@current_resource.name}, have payload match #{!hits.empty?}")
+    found = false
+    @current_resource.check_bundle_resource.payload['metrics'].each do |cb_payload_metric|
+      Chef::Log.debug("CCD Metric - For metric #{@current_resource.name}, comparing my name '#{circonus_metric_name}' to payload name '#{cb_payload_metric['name']}'")      
+      Chef::Log.debug("CCD Metric - For metric #{@current_resource.name}, comparing my type '#{@new_resource.type().to_s()}' to payload type '#{cb_payload_metric['type']}'")
+      if circonus_metric_name == cb_payload_metric['name'] && @new_resource.type().to_s() == cb_payload_metric['type'] then
+        found = true
+        break
+      end
+    end
+
+    Chef::Log.debug("CCD Metric - For metric #{@current_resource.name}, have payload match #{found}")
     
-    @current_resource.exists(!hits.empty?)
+    @current_resource.exists(found)
 
   else
     @current_resource.exists(false)

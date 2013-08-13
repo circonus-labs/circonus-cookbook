@@ -134,8 +134,8 @@ def any_payload_changes?
   # These can all legitamitely change
 
   [ 'link', 'notes', 'derive'].each do |field|   
-    old = @current_resource.payload[field]
-    new = @new_resource.payload[field]
+    old = @current_resource.payload[field].to_s
+    new = @new_resource.payload[field].to_s
     this_changed = old != new
     if this_changed then
       Chef::Log.debug("Circonus ruleset shows field #{field} changed from '#{old.to_s}' to '#{new.to_s}'")
