@@ -9,16 +9,17 @@ attribute :id, :kind_of => String, :regex => /^\d+$/
 attribute :config, :kind_of => Hash, :default => {}
 attribute :tags, :kind_of => Array, :default => []
 
-# TODO - these should be private or readonly
-attribute :exists, :kind_of => [TrueClass, FalseClass], :default => false
-attribute :payload, :kind_of => Hash
-attribute :delete_requested, :kind_of => [TrueClass, FalseClass], :default => false
+attr_accessor :exists
+attr_accessor :payload
+attr_accessor :delete_requested
 
 # Gross hack so metric resources can find both the new_resouce and current_resource
-attribute :current_resource_ref
+attr_accessor :current_resource_ref
 
 
 def initialize(*args)
   super
   @action = :create  # default_action pre 0.10.10
+  @exists = false
+  @delete_requested = false
 end

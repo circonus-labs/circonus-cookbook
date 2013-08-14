@@ -24,7 +24,7 @@ def load_current_resource
   end
 
   @current_resource = Chef::Resource::CirconusCheckBundle.new(new_resource.name)
-  @new_resource.current_resource_ref(@current_resource) # Needed for metrics, etc to link to 
+  @new_resource.current_resource_ref = @current_resource # Needed for metrics, etc to link to 
 
   # Copy in target and type - those are the same between existing and desired
   @current_resource.target(@new_resource.target())
@@ -52,8 +52,8 @@ def load_current_resource
     # TODO check target
     # In theory we could update the check bundle....
 
-    @current_resource.payload(payload)
-    @current_resource.exists(true)
+    @current_resource.payload = payload
+    @current_resource.exists = true
   else
 
     # No ID provided - do an exhaustive search (though we cache on the target and type)
@@ -68,8 +68,8 @@ def load_current_resource
       # Fetch it
       candidate_payload = api.get_check_bundle(ids[0])
       @current_resource.id(ids[0])
-      @current_resource.payload(candidate_payload)
-      @current_resource.exists(true)
+      @current_resource.payload = candidate_payload
+      @current_resource.exists = true
     end
   end
 
@@ -85,9 +85,9 @@ def load_current_resource
     end
 
     # Deep clone
-    @new_resource.payload(Marshal.load(Marshal.dump(@current_resource.payload)))
+    @new_resource.payload = Marshal.load(Marshal.dump(@current_resource.payload))
     @new_resource.id(@current_resource.id)
-    @new_resource.exists(true)
+    @new_resource.exists = true
   else 
     init_empty_payload
   end
@@ -103,7 +103,7 @@ def init_empty_payload
     'config'  => {},
     'tags'    => [],
   }
-  @new_resource.payload(payload)
+  @new_resource.payload = payload
   
 end
 
@@ -239,7 +239,7 @@ def action_delete
   unless @current_resource.payload['status'] == 'deleted' || @current_resource.payload['status'] == 'disabled' then
     # Chef::Log.info(">>>>>>>CB.action_delete - injecting upload action")
     @new_resource.updated_by_last_action(true)
-    @new_resource.delete_requested(true)
+    @new_resource.delete_requested = true
     @new_resource.notifies(:upload, @new_resource, :delayed)        
   end
 
