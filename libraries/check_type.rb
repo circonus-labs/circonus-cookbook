@@ -12,6 +12,8 @@ class Circonus
           klass = Circonus::CheckType::Ping
         when :'json:nad', :nad
           klass = Circonus::CheckType::Nad
+        when :ntp
+          klass = Circonus::CheckType::Ntp
         else
           raise "Sorry, no support in Circonus::MediaScanner for check type '#{check_bundle_resource.type.to_sym}' yet"
         end
