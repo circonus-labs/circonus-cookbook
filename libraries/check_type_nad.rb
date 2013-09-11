@@ -22,7 +22,7 @@ class Circonus
         # TODO read SSl, path, etc from config
         url = "http://" + target + ":" + node[:nad][:port].to_s + '/'
         content = open(url).read
-        data = JSON.parse(content)
+        data = ::JSON.parse(content)
 
         # Data is a HoHoH
         # Top level keys are nad plugin (script) names

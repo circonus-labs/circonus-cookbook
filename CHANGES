@@ -1,3 +1,11 @@
+2013-09-10 v0.0.10 clinton at omniti dot com
+  * nad check type added
+  * Misc cleanup of log messages
+  * Clean up attributes on LWRPs, removing some that shouldn't have been exposed
+  * Bad call to JSON.parse in nad check type (issue #7, David Nicklay)
+  * Bad debug log message (issue #8, David Nicklay)
+  * halt_on_error is *experimental*, may simply lead to new, harder to understand errors
+
 2013-08-12 v0.0.9 clinton at omniti dot com  
   * Several minor fixes to change detection in graph datapoints, rules, 
     check bundles, and metrics, which were causing spurious API calls. 
