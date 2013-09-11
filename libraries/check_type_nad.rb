@@ -38,6 +38,7 @@ class Circonus
             flattened[full_name.to_sym] = {
               :label => full_name,  # No way of knowing a prettier name
               :type  => NAD_TYPE_TO_CIRCONUS_TYPE[check_details['_type']],
+              :value  => check_details['_value']
             }
           end
         end
