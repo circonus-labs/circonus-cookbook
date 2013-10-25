@@ -1,3 +1,7 @@
+2013-10-22 v0.0.11 clinton at omniti dot com
+  * Return values from metric scanner
+  * Cache mechanism overhaul (David Nicklay)
+
 2013-09-10 v0.0.10 clinton at omniti dot com
   * nad check type added
   * Misc cleanup of log messages
