@@ -8,9 +8,22 @@ def load_current_resource
   # Apply defaults to the desired state
   # TODO - should this be in the resource initialize() ?
   unless @new_resource.target then 
-    if self.respond_to?(:guess_main_ip) then
-      tgt = node['circonus']['target'].empty? ? guess_main_ip() : node['circonus']['target']
+    if node['circonus']['target'] == :guess then
+      # Force guess_main_ip
+      tgt = guess_main_ip()
+    elsif node['circonus']['target'] == :auto then
+      # Force ohai ip address
+      tgt = node[:ipaddress]
+    elsif node['circonus']['target'].empty? then
+      # If we didn't specify anything, use guess_main_ip if available,
+      # otherwise use ohai
+      if self.respond_to?(:guess_main_ip) then
+        tgt = guess_main_ip()
+      else
+        tgt = node[:ipaddress]
+      end
     else
+      # If we specified an explicit target, then use it
       tgt = node['circonus']['target']
     end
     @new_resource.target(tgt)

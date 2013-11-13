@@ -39,7 +39,7 @@ Actions:
 Resource Attributes:
 
     * display_name - Display name of bundle, will appear in email subjects.  Uses resource name if not provided.
-    * target - Hostname or IP to query.  Defaults to node[:circonus][:target], which defaults to the node's guess_main_ip() according to NetInfo.
+    * target - Hostname or IP to query.  Defaults to node[:circonus][:target], which in turn defaults to the node's guess_main_ip() according to NetInfo. If NetInfo isn't present, then it defaults to node[:ipaddress].
     * type - Type of check, like :resmon or :http    
     * brokers - Array of broker names.  Defaults to node[:circonus][:default_brokers]
     * tags - Array of freeform strings to be used as tags in the web UI.  Default [ ] 
@@ -240,7 +240,7 @@ Currently very few check types are supported by MetricScanner - only ping and na
         :api_token => 'some-string-here',  # Required - see  https://circonus.com/resources/api#authentication
         # Note: app_token is a deprecated alias for api_token
 
-        :target => 'your-ip',           # By default, uses value of node[:fqdn]
+        :target => 'your-ip',           # By default, uses guess_main_ip() or node[:ipaddress], specify :guess or :auto to force one of these methods.
         :default_brokers => [ ],           # List of names of brokers, like 'agent-il-1', to use when creating check bundles        
 
         # Path to a directory in which we will cache circonus config data
@@ -327,7 +327,7 @@ The main repo is at https://github.com/omniti-labs/circonus-cookbook - please fo
 ## Contributors
 
   Eric Saxby
-
+  Mark Harrison
 
 
 
