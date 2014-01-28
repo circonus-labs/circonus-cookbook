@@ -63,7 +63,7 @@ Actions:
 Resource Attributes:
 
     * name - Name of metric.  Consult your check type docs for information on what can go here.  Defaults to resource name.
-    * type - Type of value returned - one of :text, :numeric,  or :histogram
+    * type - Type of value returned - one of :text, :numeric, :composite or :histogram
     * check_bundle - Name of the check bundle resource that should contain this metric.  Required.
 
 See also: the Circonus::MetricScanner utility library, which helps enumerate available metrics.
@@ -202,6 +202,38 @@ For composites, the following attributes can/should be used:
     * hidden
     * data_formula - ie "= 100 * A / (A + B)"
     * legend_formula
+
+## Composite Checks:
+
+Circonus allows for composite checks, where data from multiple metrics can be combined at collection time and aggregated into
+a single metric.
+
+    * The broker should always be defined as 'composite'
+    * The aggregation happens within the Circonus services, not in an
+      enterprise broker.
+    * The check bundle expects a single circonus_metric to be added to the bundle
+    * Composite checks are updated as the source metrics are collected
+
+This last point is important. If you create a graph of composite metrics and play it in real-time, the data will update
+as the other metrics run (at their minimum default rate). Often this is 60 seconds, so in real time you will see the data
+arrive in discrete chunks distributed across the 60 minute period.
+
+Example:
+
+    circonus_check_bundle "Aggregated Stuffs from Things" do
+      type :composite
+      brokers ['composite']
+      config 'formula' => "stats:sum(metric:counter(tag:thing, \things`stuff\", 60000))",
+             'composite_metric_name' => 'things`stuff'
+      target 'aggregated-things'
+    end
+
+    circonus_metric "things`stuff" do
+      type :composite
+      check_bundle "Aggregated Stuffs from Things"
+    end
+
+See [the docs](https://login.circonus.com/user/docs/Data/CheckTypes#Composite) for more info on composite formulas.
 
 ## Utility Library
 
