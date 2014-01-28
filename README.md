@@ -208,12 +208,14 @@ For composites, the following attributes can/should be used:
 Circonus allows for composite checks, where data from multiple metrics can be combined at collection time and aggregated into
 a single metric.
 
-* The broker should always be defined as 'composite'. The aggregation happens within the Circonus services, not in an
-  enterprise broker.
-* The check bundle expects a single circonus_metric to be added to the bundle
-* Composite checks are updated as the source metrics are collected. So, if you create a graph of composite metrics and
-  play it in real-time, the data will update as the other metrics run (at their minimum default rate). Often this is 60
-  seconds.
+    * The broker should always be defined as 'composite'. The aggregation happens within the Circonus services, not in an
+      enterprise broker.
+    * The check bundle expects a single circonus_metric to be added to the bundle
+    * Composite checks are updated as the source metrics are collected. So, if you create a graph of composite metrics and
+      play it in real-time, the data will update as the other metrics run (at their minimum default rate). Often this is 60
+      seconds.
+
+Example:
 
     circonus_check_bundle "Aggregated Stuffs from Things" do
       type :composite
