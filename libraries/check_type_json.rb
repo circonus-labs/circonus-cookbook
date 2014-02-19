@@ -46,6 +46,7 @@ class Circonus
           scan[metric_name] = {
             :label => metric_name, # No way of knowing a prettier name
             :type => value =~ /^\d+(\.\d+)?$/ ? :numeric : :text,
+            :value => value
           }
         end
 
