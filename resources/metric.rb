@@ -1,7 +1,7 @@
 actions :create
 attribute :metric_name, :name_attribute
 attribute :check_bundle
-attribute :type, :kind_of => Symbol, :equal_to => [:text, :numeric, :histogram]
+attribute :type, :kind_of => Symbol, :equal_to => [:text, :numeric, :histogram, :composite]
 
 attr_accessor :check_bundle_resource
 attr_accessor :exists

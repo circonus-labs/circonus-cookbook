@@ -39,7 +39,7 @@ Actions:
 Resource Attributes:
 
     * display_name - Display name of bundle, will appear in email subjects.  Uses resource name if not provided.
-    * target - Hostname or IP to query.  Defaults to node[:circonus][:target], which defaults to the node's guess_main_ip() according to NetInfo.
+    * target - Hostname or IP to query.  Defaults to node[:circonus][:target], which in turn defaults to the node's guess_main_ip() according to NetInfo. If NetInfo isn't present, then it defaults to node[:ipaddress].
     * type - Type of check, like :resmon or :http    
     * brokers - Array of broker names.  Defaults to node[:circonus][:default_brokers]
     * tags - Array of freeform strings to be used as tags in the web UI.  Default [ ] 
@@ -63,7 +63,7 @@ Actions:
 Resource Attributes:
 
     * name - Name of metric.  Consult your check type docs for information on what can go here.  Defaults to resource name.
-    * type - Type of value returned - one of :text, :numeric,  or :histogram
+    * type - Type of value returned - one of :text, :numeric, :composite or :histogram
     * check_bundle - Name of the check bundle resource that should contain this metric.  Required.
 
 See also: the Circonus::MetricScanner utility library, which helps enumerate available metrics.
@@ -203,6 +203,38 @@ For composites, the following attributes can/should be used:
     * data_formula - ie "= 100 * A / (A + B)"
     * legend_formula
 
+## Composite Checks:
+
+Circonus allows for composite checks, where data from multiple metrics can be combined at collection time and aggregated into
+a single metric.
+
+    * The broker should always be defined as 'composite'
+    * The aggregation happens within the Circonus services, not in an
+      enterprise broker.
+    * The check bundle expects a single circonus_metric to be added to the bundle
+    * Composite checks are updated as the source metrics are collected
+
+This last point is important. If you create a graph of composite metrics and play it in real-time, the data will update
+as the other metrics run (at their minimum default rate). Often this is 60 seconds, so in real time you will see the data
+arrive in discrete chunks distributed across the 60 minute period.
+
+Example:
+
+    circonus_check_bundle "Aggregated Stuffs from Things" do
+      type :composite
+      brokers ['composite']
+      config 'formula' => "stats:sum(metric:counter(tag:thing, \things`stuff\", 60000))",
+             'composite_metric_name' => 'things`stuff'
+      target 'aggregated-things'
+    end
+
+    circonus_metric "things`stuff" do
+      type :composite
+      check_bundle "Aggregated Stuffs from Things"
+    end
+
+See [the docs](https://login.circonus.com/user/docs/Data/CheckTypes#Composite) for more info on composite formulas.
+
 ## Utility Library
 
 The cookbook includes a utility class, Circonus::MetricScanner, which provides a way to list the metrics available on a proposed check bundle before it is actually created in circonus.  This is needed for check types that can be configured, like nad and resmon.
@@ -240,7 +272,7 @@ Currently very few check types are supported by MetricScanner - only ping and na
         :api_token => 'some-string-here',  # Required - see  https://circonus.com/resources/api#authentication
         # Note: app_token is a deprecated alias for api_token
 
-        :target => 'your-ip',           # By default, uses value of node[:fqdn]
+        :target => 'your-ip',           # By default, uses guess_main_ip() or node[:ipaddress], specify :guess or :auto to force one of these methods.
         :default_brokers => [ ],           # List of names of brokers, like 'agent-il-1', to use when creating check bundles        
 
         # Path to a directory in which we will cache circonus config data
@@ -327,7 +359,7 @@ The main repo is at https://github.com/omniti-labs/circonus-cookbook - please fo
 ## Contributors
 
   Eric Saxby
-
+  Mark Harrison
 
 
 
