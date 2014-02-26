@@ -11,6 +11,7 @@ class Circonus
         # Discovery via HTTP
         url = config[:url]
 
+        content = nil
         begin
           content = open(url).read
         rescue Errno::ETIMEDOUT

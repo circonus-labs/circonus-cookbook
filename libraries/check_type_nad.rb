@@ -22,6 +22,7 @@ class Circonus
         # TODO read SSL, path, etc from config
         url = "http://" + target + ":" + node[:nad][:port].to_s + '/'
 
+        content = nil
         begin
           content = open(url).read
         rescue Errno::ETIMEDOUT

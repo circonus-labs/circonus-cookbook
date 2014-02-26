@@ -25,6 +25,7 @@ class Circonus
         # TODO read SSl, path, etc from config
         url = "http://" + target + ":" + node[:resmon][:port].to_s + '/'
 
+        xml = nil
         begin
           xml = open(url).read
         rescue Errno::ETIMEDOUT
