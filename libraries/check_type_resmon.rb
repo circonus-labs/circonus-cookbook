@@ -7,9 +7,9 @@ class Circonus
   class CheckType
     class Resmon < Circonus::CheckType
       Circonus::MetricScanner.register_type(:'resmon', self)
-      
+
       RESMON_TYPE_TO_CIRCONUS_TYPE = {
-        # TODO 
+        # TODO
         "i" => :numeric,
         "I" => :numeric,
         "l" => :numeric,
@@ -21,10 +21,20 @@ class Circonus
 
       def all
         # Discovery via HTTP
-        
+
         # TODO read SSl, path, etc from config
-        url = "http://" + target + ":" + node[:resmon][:port].to_s + '/'        
-        xml = open(url).read
+        url = "http://" + target + ":" + node[:resmon][:port].to_s + '/'
+
+        begin
+          xml = open(url).read
+        rescue Errno::ETIMEDOUT
+          Chef::Log.warn("Resmon at #{target}:#{node[:resmon][:port]} timed out. Returning empty metrics list.")
+          return Hash.new()
+        rescue Errno::ECONNREFUSED
+          Chef::Log.warn("Resmon at #{target}:#{node[:resmon][:port]} did not respond. Returning empty metrics list.")
+          return Hash.new()
+        end
+
         # pp xml
         doc = REXML::Document.new(xml)
 
@@ -33,7 +43,7 @@ class Circonus
           resmon_module = result_ele.attributes["module"]
           resmon_instance = result_ele.attributes["service"]
           prefix = resmon_module + '`' + resmon_instance
-          
+
           # Every resmon metric has a numeric 'duration' metric
           metric_info[prefix + '`duration'] = { :label => prefix + '`duration', :type => :numeric }
 

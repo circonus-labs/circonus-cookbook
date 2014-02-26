@@ -6,7 +6,7 @@ class Circonus
   class CheckType
     class Nad < Circonus::CheckType
       Circonus::MetricScanner.register_type(:'json:nad', self)
-      
+
       NAD_TYPE_TO_CIRCONUS_TYPE = {
         "i" => :numeric,
         "I" => :numeric,
@@ -18,19 +18,29 @@ class Circonus
 
       def all
         # Discovery via HTTP
-        
-        # TODO read SSl, path, etc from config
+
+        # TODO read SSL, path, etc from config
         url = "http://" + target + ":" + node[:nad][:port].to_s + '/'
-        content = open(url).read
+
+        begin
+          content = open(url).read
+        rescue Errno::ETIMEDOUT
+          Chef::Log.warn("NAD at #{target}:#{node[:nad][:port]} timed out. Returning empty metrics list.")
+          return Hash.new()
+        rescue rescue Errno::ECONNREFUSED
+          Chef::Log.warn("NAD at #{target}:#{node[:nad][:port]} did not respond. Returning empty metrics list.")
+          return Hash.new()
+        end
+
         data = ::JSON.parse(content)
 
         # Data is a HoHoH
         # Top level keys are nad plugin (script) names
         # Next level is individual checks in each plugin
         # Final is type/value hash
-        
+
         # Condense to hash, mapping full name to type
-        
+
         flattened = Hash.new
         data.each do |plugin_name, checks|
           checks.each do |check_name, check_details|
@@ -42,7 +52,7 @@ class Circonus
             }
           end
         end
-        
+
         return flattened
 
       end
