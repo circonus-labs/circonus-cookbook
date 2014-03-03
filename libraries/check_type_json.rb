@@ -10,7 +10,18 @@ class Circonus
       def all
         # Discovery via HTTP
         url = config[:url]
-        content = open(url).read
+
+        content = nil
+        begin
+          content = open(url).read
+        rescue Errno::ETIMEDOUT
+          Chef::Log.warn("JSON at #{url} timed out. Returning empty metrics list.")
+          return Hash.new()
+        rescue Errno::ECONNREFUSED
+          Chef::Log.warn("JSON at #{url} did not respond. Returning empty metrics list.")
+          return Hash.new()
+        end
+
         data = ::JSON.parse(content)
 
         # From JSON Docs link on any Circonus Web UI check page
