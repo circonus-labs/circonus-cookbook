@@ -28,7 +28,7 @@ class Circonus
         rescue Errno::ETIMEDOUT
           Chef::Log.warn("NAD at #{target}:#{node[:nad][:port]} timed out. Returning empty metrics list.")
           return Hash.new()
-        rescue rescue Errno::ECONNREFUSED
+        rescue Errno::ECONNREFUSED
           Chef::Log.warn("NAD at #{target}:#{node[:nad][:port]} did not respond. Returning empty metrics list.")
           return Hash.new()
         end
