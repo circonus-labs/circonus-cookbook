@@ -64,7 +64,7 @@ def init_empty_payload
     'datapoints' => [],
     'guides' => [],
     'style' => 'line',
-    'line_style' => nil
+    'line_style' => 'interpolated'
   }
   @new_resource.payload(payload)
 end

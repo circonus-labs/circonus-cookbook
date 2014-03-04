@@ -7,7 +7,7 @@ attribute :max_right_y, :kind_of => Integer
 attribute :min_left_y, :kind_of => Integer
 attribute :min_right_y, :kind_of => Integer
 attribute :style, :kind_of => Symbol
-attribute :line_style, :kind_of => [Symbol, NilClass], :equal_to => [:stepped, :interpolated, nil], :default => nil
+attribute :line_style, :kind_of => [Symbol, NilClass], :equal_to => [:stepped, :interpolated], :default => :interpolated
 attribute :title, :kind_of => String, :name_attribute => true
 attribute :id
 attribute :tags, :kind_of => Array, :default => []
