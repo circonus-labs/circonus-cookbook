@@ -64,6 +64,7 @@ def init_empty_payload
     'datapoints' => [],
     'guides' => [],
     'style' => 'line',
+    'line_style' => nil
   }
   @new_resource.payload(payload)
 end
@@ -79,6 +80,7 @@ def copy_resource_attributes_into_payload
    'min_left_y',
    'min_right_y',
    'style',
+   'line_style',
    'title',
   ].each do |field|
     value = @new_resource.method(field).call
@@ -111,6 +113,7 @@ def any_payload_changes?
    'min_left_y',
    'min_right_y',
    'style',
+   'line_style',
    'title',
   ].each do |field|
     old = @current_resource.payload[field].to_s

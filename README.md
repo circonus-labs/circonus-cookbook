@@ -157,6 +157,7 @@ Resource Attributes:
 
     * id - optional, GUID of the graph.  If provided, you can change the name of the graph; if omitted, changing the name of the graph will create a new graph.
     * style - :line or :area
+    * line_style - :stepped or :interpolated
     * tags - Array of freeform strings to be used as tags in the web UI.  Default [ ] 
     * max_left_y, max_right_y, min_left_y, min_right_y - Y Axis limits
 
@@ -183,6 +184,9 @@ Resource Attributes:
     * legend_formula - see web UI help; may be left null
     * hidden - true/false, false default
     * derive - :counter, :derive, :gauge - :gauge is default
+    * stack - integer signifying which stack set the datapoint belongs to (greater than or equal to 0) (defaults to nil)
+
+When putting datapoints into a stack, `line_style` must be set on the graph.
     
 In order to create a guide, the following attributes can/should be used:
 
