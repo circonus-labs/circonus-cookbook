@@ -66,7 +66,7 @@ class Circonus
 
       def terrifying_flatten(inbound, prefix = nil)
         outbound = {}
-        if inbound.kind_of? (Hash) then
+        if inbound.kind_of?(Hash) then
           inbound.each do |key, val|
             if val.kind_of?(Hash) || val.kind_of?(Array)    
               outbound.merge!(terrifying_flatten(val, (prefix ? prefix + '`' : '') + key.to_s))      
