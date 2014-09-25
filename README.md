@@ -121,14 +121,14 @@ Resource Attributes:
 
    * **`rule_set`** - Name of a circonus_rule_set chef resource, which must be defined prior to the rule resource.
    * **`criteria`** - Operator to use to detect a match of the rule.  Valid values:
-        * **`min value`** - for numeric metrics
-        * **`max value`** - for numeric metrics
-        * **`match`** - exact match for text metrics
-        * **`does not match`** - exact match for text metrics
-        * **`contains`** - regex, for text metrics.  If the regex matches, the alert fires.
-        * **`does not contain`** - regex, for text metrics.  If the regex does not match, the alert fires.
-        * **`on change`** - for text metrics, compares to last detected value
-        * **`on absence`** - for all metrics, detects metric loss of signal
+     * **`min value`** - for numeric metrics
+     * **`max value`** - for numeric metrics
+     * **`match`** - exact match for text metrics
+     * **`does not match`** - exact match for text metrics
+     * **`contains`** - regex, for text metrics.  If the regex matches, the alert fires.
+     * **`does not contain`** - regex, for text metrics.  If the regex does not match, the alert fires.
+     * **`on change`** - for text metrics, compares to last detected value
+     * **`on absence`** - for all metrics, detects metric loss of signal
    * **`severity`** - Integer severity level, 1-5.  If this rule matches, the contact group(s) assigned in the rule_set to this severity level will be notified.
    * **`value`** - Operand for those criteria that require one.  String.
    * **`wait`** - Integer, delay in minutes to wait before alerting.  Use this to suppress false positives due to transients.
