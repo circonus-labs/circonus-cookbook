@@ -352,7 +352,7 @@ Currently very few check types are supported by MetricScanner - only ping and na
 
 # Contributing
 
-The main repo is at https://github.com/omniti-labs/circonus-cookbook - please fork, make a topic branch, and send a pull request when you want to submit.
+The main repo is at https://github.com/circonus-labs/circonus-cookbook - please fork, make a topic branch, and send a pull request when you want to submit.
 
 # Authors
 
